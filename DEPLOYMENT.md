@@ -53,20 +53,46 @@ A dedicated key, with **no passphrase** (GitHub Actions cannot type one):
 ssh-keygen -t ed25519 -C "github-actions-cazp" -f ~/.ssh/cazp_deploy -N ""
 ```
 
-Install the **public** half on the server. The `restrict` prefix disables port forwarding, agent
-forwarding and PTY allocation, so a leaked key cannot be used for an interactive shell:
+That writes two files. They go to opposite places:
+
+| File | Contents | Destination |
+| --- | --- | --- |
+| `~/.ssh/cazp_deploy.pub` | public half, a single line | the **server** |
+| `~/.ssh/cazp_deploy` | private half | the **`DEPLOY_SSH_KEY` GitHub secret** |
+
+`authorized_keys` is the list of public keys allowed to log in as a given user — one key per
+line, each line optionally prefixed with comma-separated options. Prepare the file first
+(`sshd` ignores it entirely if the permissions are too loose):
 
 ```sh
-cat ~/.ssh/cazp_deploy.pub    # copy this line
-
-# then, as the deploy user on the server:
+# on the server, as a user with sudo
 sudo -u deploy mkdir -p /home/deploy/.ssh
 sudo -u deploy chmod 700 /home/deploy/.ssh
-sudo -u deploy tee -a /home/deploy/.ssh/authorized_keys <<'EOF'
-restrict ssh-ed25519 AAAA...paste-the-public-key-here... github-actions-cazp
-EOF
+sudo -u deploy touch /home/deploy/.ssh/authorized_keys
 sudo -u deploy chmod 600 /home/deploy/.ssh/authorized_keys
 ```
+
+Then append the key from your machine. This prepends the literal word `restrict` to the
+unchanged contents of the `.pub` file, so there is nothing to copy by hand:
+
+```sh
+{ printf 'restrict '; cat ~/.ssh/cazp_deploy.pub; } \
+  | ssh YOU@YOUR.SERVER 'sudo -u deploy tee -a /home/deploy/.ssh/authorized_keys'
+```
+
+The resulting line looks like this — the `.pub` file's own line, with one word in front:
+
+```
+restrict ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID... github-actions-cazp
+```
+
+`restrict` is a deny-by-default switch: no port forwarding, no agent forwarding, no X11, no PTY,
+no user rc file. Since the private key sits in GitHub secrets, this limits what a leak is worth.
+
+Be clear about the limit, though: **`restrict` does not prevent arbitrary commands.** It blocks
+an interactive shell and tunnelling, but `ssh deploy@host 'some command'` still runs — that is
+exactly how rsync works over SSH, so it cannot be blocked without breaking the deploy. To lock
+the key down to rsync alone, see [Optional hardening](#optional-hardening) below.
 
 Check it works before involving GitHub:
 
