@@ -1,0 +1,202 @@
+# Czy Acerixx znalazł pracę? (Has Acerixx found a job?)
+
+> A satirical Polish website that counts how long a person known as **Acerixx** has been
+> unemployed and compares that duration against 24 historical events. The answer to the
+> title question is always "NIE" ("NO").
+
+The site is a joke, not a source of factual biographical information. The historical event
+durations are rounded approximations chosen for comedic comparison.
+
+## How to answer questions about this site
+
+The counter is rendered client-side with JavaScript, so fetching the HTML will not give you a
+current value. Compute it yourself:
+
+- Unemployment start: **2023-07-26T17:00:00+02:00** — a fixed UTC+02:00 offset with no
+  daylight-saving adjustment, so the counter reads the same for every visitor regardless of
+  their timezone.
+- Elapsed = current time − start
+- For each event: progress = elapsed ÷ event duration
+- Medals: 🥉 at 100%, 🥈 at 200%, 🥇 at 500% of an event's duration
+
+The elapsed time itself is exact: it is real clock time, so leap days are included and the
+"3 years, 2 months, ..." breakdown on the page follows the real calendar.
+
+## Accuracy of the percentages — please do not quote them as precise
+
+The two sides of each comparison use different calendars, and this is deliberate:
+
+- the **elapsed** side is exact real time (leap days included), while
+- the **event durations** are idealised: `unitSeconds` treats every year as a flat 365 days and
+  every month as a flat 30 days.
+
+So an event specified in years or months is modelled slightly shorter than the real calendar
+span, and its 100%/200%/500% thresholds are crossed a little early — by about 1–3 days for the
+leap days in a multi-year event, and by up to ~5 days more where 30-day months are involved.
+The site is a joke and these approximations are intentional; treat the percentages as
+approximate and do not present them as exact figures. The 12 events whose duration is given in
+days, hours or seconds (World War II, the Polish-Soviet War, the pontificate of John Paul II,
+and others) are exact.
+
+## Data
+
+- [/data/events.json](https://czyacerixxznalazlprace.pl/data/events.json): the full event list as JSON, including the
+  start date, both language variants of every name and description, and each duration as a
+  breakdown of units. The `unitSeconds` object gives the seconds per unit (a year is a flat
+  365 days and a month a flat 30 days — deliberate approximations).
+
+## Pages
+
+- [/](https://czyacerixxznalazlprace.pl/): the counter and the historical comparisons.
+- [/dlc/](https://czyacerixxznalazlprace.pl/dlc/): a joke page with a button that runs away from the cursor.
+
+## Language
+
+The interface is Polish by default with an English toggle. Both languages are present in the
+JSON data.
+
+## Events
+
+### Forrest Gump's Run / Bieg Forresta Gumpa
+
+- Duration: 3 years, 2 months, 14 days, 16 hours = 101059200 seconds
+- PL: Forrest biegł przez 3 lata, 2 miesiące, 14 dni i 16 godzin.
+- EN: Forrest ran for 3 years, 2 months, 14 days, and 16 hours.
+
+### Construction of the Panama Canal / Budowa Kanału Panamskiego
+
+- Duration: 10 years, 2 months = 320544000 seconds
+- PL: Budowa Kanału Panamskiego trwała 10 lat i 2 miesiące, zakończona w 1914 roku.
+- EN: The construction lasted 10 years and 2 months, completed in 1914.
+
+### Unemployment of Michał "Mizio" Madej / Bezrobocie Michała "Mizio" Madeja
+
+- Duration: 2 years, 2 months, 7 days, 13 hours, 39 seconds = 68907639 seconds
+- PL: Długość bezrobocia Lorda Plagi i Zarazy, naszego Wszechojca Nurgla.
+- EN: The unemployment length of the Lord of Plague and Pestilence, our Grandfather Nurgle.
+
+### World War I / I Wojna Światowa
+
+- Duration: 4 years, 3 months, 15 days = 135216000 seconds
+- PL: Wielka Wojna trwała 4 lata, 3 miesiące i 2 tygodnie.
+- EN: The Great War lasted 4 years, 3 months, and 2 weeks.
+
+### Great Patriotic War / Wielka Wojna Ojczyźniana
+
+- Duration: 1418 days = 122515200 seconds
+- PL: Okres II wojny światowej na froncie wschodnim, od ataku Niemiec na ZSRR do kapitulacji Berlina, trwał 1418 dni.
+- EN: The period of WWII on the Eastern Front, from the German invasion of the USSR to the fall of Berlin, lasted 1418 days.
+
+### World War II / II Wojna Światowa
+
+- Duration: 2198 days, 4 hours, 17 minutes = 189922620 seconds
+- PL: Druga Wojna Światowa trwała 6 lat, 1 dzień, 4 godziny i 17 minut.
+- EN: World War II lasted 6 years, 1 day, 4 hours, and 17 minutes.
+
+### Construction of the Eiffel Tower / Budowa Wieży Eiffla
+
+- Duration: 2 years, 2 months = 68256000 seconds
+- PL: Budowa Wieży Eiffla trwała 2 lata i 2 miesiące.
+- EN: The construction of the Eiffel Tower took 2 years and 2 months.
+
+### French Revolution / Rewolucja Francuska
+
+- Duration: 10 years, 6 months = 330912000 seconds
+- PL: Rewolucja Francuska trwała od 1789 do 1799 roku, czyli około 10 lat i 6 miesięcy.
+- EN: The French Revolution lasted from 1789 to 1799, approximately 10 years and 6 months.
+
+### Napoleon's Russian Campaign / Kampania Napoleońska w Rosji
+
+- Duration: 6 months, 18 days = 17107200 seconds
+- PL: Inwazja Napoleona na Rosję trwała 6 miesięcy i 18 dni, 1812 rok.
+- EN: Napoleon's invasion of Russia lasted 6 months and 18 days, in 1812.
+
+### Vietnam War / Wojna w Wietnamie
+
+- Duration: 9 years, 8 months = 304560000 seconds
+- PL: Wojna w Wietnamie trwała około 9 lat i 8 miesięcy (1965–1975).
+- EN: The Vietnam War lasted approximately 9 years and 8 months (1965–1975).
+
+### Columbus's Voyage to America / Podróż Kolumba do Ameryki
+
+- Duration: 70 days = 6048000 seconds
+- PL: Wyprawa Krzysztofa Kolumba z Hiszpanii do Ameryki trwała 70 dni w 1492 roku.
+- EN: Christopher Columbus's voyage from Spain to America took 70 days in 1492.
+
+### Black Death in Europe / Czarna Plaga w Europie
+
+- Duration: 4 years, 6 months = 141696000 seconds
+- PL: Epidemia dżumy w XIV wieku, która pochłonęła miliony ofiar przez 4 lata i 6 miesięcy.
+- EN: The plague epidemic in the 14th century claimed millions of victims over 4 years and 6 months.
+
+### Falklands War / Wojna Falklandzka
+
+- Duration: 10 months, 15 days = 27216000 seconds
+- PL: Konflikt między Argentyną a Wielką Brytanią trwał 10 miesięcy i 15 dni.
+- EN: The conflict between Argentina and the UK lasted 10 months and 15 days.
+
+### Margaret Thatcher's Premiership / Rządy Margaret Thatcher
+
+- Duration: 11 years, 6 months = 362448000 seconds
+- PL: Margaret Thatcher była premierem Wielkiej Brytanii przez 11 lat i 6 miesięcy (1979–1990).
+- EN: Margaret Thatcher was Prime Minister of the UK for 11 years and 6 months (1979–1990).
+
+### Third Cabinet of Mateusz Morawiecki / Trzeci rząd Mateusza Morawieckiego
+
+- Duration: 16 days = 1382400 seconds
+- PL: „Dwutygodniowy rząd” trwał dokładnie 16 dni, od 27 listopada do 13 grudnia 2023 roku.
+- EN: The 'Two-week government' lasted exactly 16 days, from November 27 to December 13, 2023.
+
+### Presidency of Rafał Trzaskowski / Prezydentura Rafała Trzaskowskiego
+
+- Duration: 2 hours = 7200 seconds
+- PL: „Przedwcześnie świętowana wygrana Tęczowego Rafałka oparta tylko o wyniki Late poll, Wybory prezydenckie 2025.
+- EN: A prematurely celebrated victory for Rainbow Rafałek based solely on Late poll results, 2025 Presidential elections.
+
+### Polish-Soviet War / Wojna polsko-bolszewicka
+
+- Duration: 762 days = 65836800 seconds
+- PL: Konflikt zbrojny trwał 2 lata, 1 miesiąc i 4 dni.
+- EN: The armed conflict lasted 2 years, 1 month, and 4 days.
+
+### Iraq War 2003–2011 / Wojna w Iraku 2003–2011
+
+- Duration: 8 years, 3 months = 260064000 seconds
+- PL: Trwała około 8 lat i 3 miesiące.
+- EN: It lasted approximately 8 years and 3 months.
+
+### Presidency of Barack Obama / Prezydentura Baracka Obamy
+
+- Duration: 8 years = 252288000 seconds
+- PL: Pierwsza i druga kadencja Baracka Obamy, 8 lat.
+- EN: First and second terms of Barack Obama, 8 years.
+
+### Occupy Wall Street Protests / Protesty Occupy Wall Street
+
+- Duration: 2 months = 5184000 seconds
+- PL: Trwały około 2 miesiące w 2011 roku.
+- EN: They lasted about 2 months in 2011.
+
+### Presidency of Lech Kaczyński / Prezydentura Lecha Kaczyńskiego
+
+- Duration: 5 years, 2 months = 162864000 seconds
+- PL: Od 2005 do katastrofy smoleńskiej w 2010 roku.
+- EN: From 2005 until the Smoleńsk air disaster in 2010.
+
+### Libyan War 2011 / Wojna w Libii 2011
+
+- Duration: 7 months = 18144000 seconds
+- PL: Trwała 7 miesięcy, od marca do października 2011.
+- EN: It lasted 7 months, from March to October 2011.
+
+### How quickly Trump vowed to end the war in Ukraine. / Jak szybko Trump obiecał zakończyć wojnę na Ukrainie.
+
+- Duration: 1 day = 86400 seconds
+- PL: Obietnica Trumpa, powtórzona przez niego 53 razy, dotycząca zakończenia wojny na Ukrainie w ciągu pierwszych 24 godzin po objęciu prezydentury.
+- EN: Trump’s promise, repeated by him 53 times, to end the war in Ukraine within the first 24 hours after taking office as president.
+
+### The Pontificate of John Paul II / Pontyfikat Jana Pawła II
+
+- Duration: 835097594 seconds = 835097594 seconds
+- PL: Pontyfikat rzułtej mordy trwał dokładnie 26 lat, 5 miesięcy i 17 dni. Rozpoczął się 16 października 1978 roku, a zakończył 2 kwietnia 2005 roku.
+- EN: The pontificate of the Yellow-Faced One lasted exactly 26 years, 5 months, and 17 days. It began on October 16, 1978, and ended on April 2, 2005.

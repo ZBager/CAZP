@@ -1,0 +1,346 @@
+{
+    "startDate": "2023-07-26T17:00:00+02:00",
+    "unitSeconds": {
+        "years": 31536000,
+        "months": 2592000,
+        "days": 86400,
+        "hours": 3600,
+        "minutes": 60,
+        "seconds": 1
+    },
+    "events": [
+        {
+            "name": {
+                "pl": "Bieg Forresta Gumpa",
+                "en": "Forrest Gump's Run"
+            },
+            "duration": {
+                "years": 3,
+                "months": 2,
+                "days": 14,
+                "hours": 16
+            },
+            "desc": {
+                "pl": "Forrest biegł przez 3 lata, 2 miesiące, 14 dni i 16 godzin.",
+                "en": "Forrest ran for 3 years, 2 months, 14 days, and 16 hours."
+            }
+        },
+        {
+            "name": {
+                "pl": "Budowa Kanału Panamskiego",
+                "en": "Construction of the Panama Canal"
+            },
+            "duration": {
+                "years": 10,
+                "months": 2
+            },
+            "desc": {
+                "pl": "Budowa Kanału Panamskiego trwała 10 lat i 2 miesiące, zakończona w 1914 roku.",
+                "en": "The construction lasted 10 years and 2 months, completed in 1914."
+            }
+        },
+        {
+            "name": {
+                "pl": "Bezrobocie Michała \"Mizio\" Madeja",
+                "en": "Unemployment of Michał \"Mizio\" Madej"
+            },
+            "duration": {
+                "years": 2,
+                "months": 2,
+                "days": 7,
+                "hours": 13,
+                "seconds": 39
+            },
+            "desc": {
+                "pl": "Długość bezrobocia Lorda Plagi i Zarazy, naszego Wszechojca Nurgla.",
+                "en": "The unemployment length of the Lord of Plague and Pestilence, our Grandfather Nurgle."
+            }
+        },
+        {
+            "name": {
+                "pl": "I Wojna Światowa",
+                "en": "World War I"
+            },
+            "duration": {
+                "years": 4,
+                "months": 3,
+                "days": 15
+            },
+            "desc": {
+                "pl": "Wielka Wojna trwała 4 lata, 3 miesiące i 2 tygodnie.",
+                "en": "The Great War lasted 4 years, 3 months, and 2 weeks."
+            }
+        },
+        {
+            "name": {
+                "pl": "Wielka Wojna Ojczyźniana",
+                "en": "Great Patriotic War"
+            },
+            "duration": {
+                "days": 1418
+            },
+            "desc": {
+                "pl": "Okres II wojny światowej na froncie wschodnim, od ataku Niemiec na ZSRR do kapitulacji Berlina, trwał 1418 dni.",
+                "en": "The period of WWII on the Eastern Front, from the German invasion of the USSR to the fall of Berlin, lasted 1418 days."
+            }
+        },
+        {
+            "name": {
+                "pl": "II Wojna Światowa",
+                "en": "World War II"
+            },
+            "duration": {
+                "days": 2198,
+                "hours": 4,
+                "minutes": 17
+            },
+            "desc": {
+                "pl": "Druga Wojna Światowa trwała 6 lat, 1 dzień, 4 godziny i 17 minut.",
+                "en": "World War II lasted 6 years, 1 day, 4 hours, and 17 minutes."
+            }
+        },
+        {
+            "name": {
+                "pl": "Budowa Wieży Eiffla",
+                "en": "Construction of the Eiffel Tower"
+            },
+            "duration": {
+                "years": 2,
+                "months": 2
+            },
+            "desc": {
+                "pl": "Budowa Wieży Eiffla trwała 2 lata i 2 miesiące.",
+                "en": "The construction of the Eiffel Tower took 2 years and 2 months."
+            }
+        },
+        {
+            "name": {
+                "pl": "Rewolucja Francuska",
+                "en": "French Revolution"
+            },
+            "duration": {
+                "years": 10,
+                "months": 6
+            },
+            "desc": {
+                "pl": "Rewolucja Francuska trwała od 1789 do 1799 roku, czyli około 10 lat i 6 miesięcy.",
+                "en": "The French Revolution lasted from 1789 to 1799, approximately 10 years and 6 months."
+            }
+        },
+        {
+            "name": {
+                "pl": "Kampania Napoleońska w Rosji",
+                "en": "Napoleon's Russian Campaign"
+            },
+            "duration": {
+                "months": 6,
+                "days": 18
+            },
+            "desc": {
+                "pl": "Inwazja Napoleona na Rosję trwała 6 miesięcy i 18 dni, 1812 rok.",
+                "en": "Napoleon's invasion of Russia lasted 6 months and 18 days, in 1812."
+            }
+        },
+        {
+            "name": {
+                "pl": "Wojna w Wietnamie",
+                "en": "Vietnam War"
+            },
+            "duration": {
+                "years": 9,
+                "months": 8
+            },
+            "desc": {
+                "pl": "Wojna w Wietnamie trwała około 9 lat i 8 miesięcy (1965–1975).",
+                "en": "The Vietnam War lasted approximately 9 years and 8 months (1965–1975)."
+            }
+        },
+        {
+            "name": {
+                "pl": "Podróż Kolumba do Ameryki",
+                "en": "Columbus's Voyage to America"
+            },
+            "duration": {
+                "days": 70
+            },
+            "desc": {
+                "pl": "Wyprawa Krzysztofa Kolumba z Hiszpanii do Ameryki trwała 70 dni w 1492 roku.",
+                "en": "Christopher Columbus's voyage from Spain to America took 70 days in 1492."
+            }
+        },
+        {
+            "name": {
+                "pl": "Czarna Plaga w Europie",
+                "en": "Black Death in Europe"
+            },
+            "duration": {
+                "years": 4,
+                "months": 6
+            },
+            "desc": {
+                "pl": "Epidemia dżumy w XIV wieku, która pochłonęła miliony ofiar przez 4 lata i 6 miesięcy.",
+                "en": "The plague epidemic in the 14th century claimed millions of victims over 4 years and 6 months."
+            }
+        },
+        {
+            "name": {
+                "pl": "Wojna Falklandzka",
+                "en": "Falklands War"
+            },
+            "duration": {
+                "months": 10,
+                "days": 15
+            },
+            "desc": {
+                "pl": "Konflikt między Argentyną a Wielką Brytanią trwał 10 miesięcy i 15 dni.",
+                "en": "The conflict between Argentina and the UK lasted 10 months and 15 days."
+            }
+        },
+        {
+            "name": {
+                "pl": "Rządy Margaret Thatcher",
+                "en": "Margaret Thatcher's Premiership"
+            },
+            "duration": {
+                "years": 11,
+                "months": 6
+            },
+            "desc": {
+                "pl": "Margaret Thatcher była premierem Wielkiej Brytanii przez 11 lat i 6 miesięcy (1979–1990).",
+                "en": "Margaret Thatcher was Prime Minister of the UK for 11 years and 6 months (1979–1990)."
+            }
+        },
+        {
+            "name": {
+                "pl": "Trzeci rząd Mateusza Morawieckiego",
+                "en": "Third Cabinet of Mateusz Morawiecki"
+            },
+            "duration": {
+                "days": 16
+            },
+            "desc": {
+                "pl": "„Dwutygodniowy rząd” trwał dokładnie 16 dni, od 27 listopada do 13 grudnia 2023 roku.",
+                "en": "The 'Two-week government' lasted exactly 16 days, from November 27 to December 13, 2023."
+            }
+        },
+        {
+            "name": {
+                "pl": "Prezydentura Rafała Trzaskowskiego",
+                "en": "Presidency of Rafał Trzaskowski"
+            },
+            "duration": {
+                "hours": 2
+            },
+            "desc": {
+                "pl": "„Przedwcześnie świętowana wygrana Tęczowego Rafałka oparta tylko o wyniki Late poll, Wybory prezydenckie 2025.",
+                "en": "A prematurely celebrated victory for Rainbow Rafałek based solely on Late poll results, 2025 Presidential elections."
+            }
+        },
+        {
+            "name": {
+                "pl": "Wojna polsko-bolszewicka",
+                "en": "Polish-Soviet War"
+            },
+            "duration": {
+                "days": 762
+            },
+            "desc": {
+                "pl": "Konflikt zbrojny trwał 2 lata, 1 miesiąc i 4 dni.",
+                "en": "The armed conflict lasted 2 years, 1 month, and 4 days."
+            }
+        },
+        {
+            "name": {
+                "pl": "Wojna w Iraku 2003–2011",
+                "en": "Iraq War 2003–2011"
+            },
+            "duration": {
+                "years": 8,
+                "months": 3
+            },
+            "desc": {
+                "pl": "Trwała około 8 lat i 3 miesiące.",
+                "en": "It lasted approximately 8 years and 3 months."
+            }
+        },
+        {
+            "name": {
+                "pl": "Prezydentura Baracka Obamy",
+                "en": "Presidency of Barack Obama"
+            },
+            "duration": {
+                "years": 8
+            },
+            "desc": {
+                "pl": "Pierwsza i druga kadencja Baracka Obamy, 8 lat.",
+                "en": "First and second terms of Barack Obama, 8 years."
+            }
+        },
+        {
+            "name": {
+                "pl": "Protesty Occupy Wall Street",
+                "en": "Occupy Wall Street Protests"
+            },
+            "duration": {
+                "months": 2
+            },
+            "desc": {
+                "pl": "Trwały około 2 miesiące w 2011 roku.",
+                "en": "They lasted about 2 months in 2011."
+            }
+        },
+        {
+            "name": {
+                "pl": "Prezydentura Lecha Kaczyńskiego",
+                "en": "Presidency of Lech Kaczyński"
+            },
+            "duration": {
+                "years": 5,
+                "months": 2
+            },
+            "desc": {
+                "pl": "Od 2005 do katastrofy smoleńskiej w 2010 roku.",
+                "en": "From 2005 until the Smoleńsk air disaster in 2010."
+            }
+        },
+        {
+            "name": {
+                "pl": "Wojna w Libii 2011",
+                "en": "Libyan War 2011"
+            },
+            "duration": {
+                "months": 7
+            },
+            "desc": {
+                "pl": "Trwała 7 miesięcy, od marca do października 2011.",
+                "en": "It lasted 7 months, from March to October 2011."
+            }
+        },
+        {
+            "name": {
+                "pl": "Jak szybko Trump obiecał zakończyć wojnę na Ukrainie.",
+                "en": "How quickly Trump vowed to end the war in Ukraine."
+            },
+            "duration": {
+                "days": 1
+            },
+            "desc": {
+                "pl": "Obietnica Trumpa, powtórzona przez niego 53 razy, dotycząca zakończenia wojny na Ukrainie w ciągu pierwszych 24 godzin po objęciu prezydentury.",
+                "en": "Trump’s promise, repeated by him 53 times, to end the war in Ukraine within the first 24 hours after taking office as president."
+            }
+        },
+        {
+            "name": {
+                "pl": "Pontyfikat Jana Pawła II",
+                "en": "The Pontificate of John Paul II"
+            },
+            "duration": {
+                "seconds": 835097594
+            },
+            "desc": {
+                "pl": "Pontyfikat rzułtej mordy trwał dokładnie 26 lat, 5 miesięcy i 17 dni. Rozpoczął się 16 października 1978 roku, a zakończył 2 kwietnia 2005 roku.",
+                "en": "The pontificate of the Yellow-Faced One lasted exactly 26 years, 5 months, and 17 days. It began on October 16, 1978, and ended on April 2, 2005."
+            }
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+# czyacerixxznalazlprace.pl — wszystko wolno indeksować i pobierać.
+# Podsumowanie strony dla modeli językowych: /llms.txt
+# Dane w formacie maszynowym: /data/events.json
+
+User-agent: *
+Allow: /
+
+# Asystenci AI pobierający stronę na prośbę użytkownika
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://czyacerixxznalazlprace.pl/sitemap.xml
