@@ -131,32 +131,20 @@ function formatDuration(totalSeconds, lang) {
 }
 
 // --- Budowa struktury porównań (tworzona raz, przebudowywana tylko po zmianie języka) ---
+// Markup karty mieszka w <template id="comparison-card"> w index.html.
 let comparisonEls = null;
 let builtLang = null;
 
 function buildComparisons(events) {
     const container = document.getElementById("comparisons");
+    const template = document.getElementById("comparison-card");
     container.innerHTML = "";
     comparisonEls = events.map((event, i) => {
-        const card = document.createElement("div");
-        card.className = "card fade-up";
+        const card = template.content.firstElementChild.cloneNode(true);
         card.style.animationDelay = `${Math.min(i * 60, 600)}ms`;
-        card.innerHTML = `
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-bold">${event.name}</span>
-                <span class="percent-chip"></span>
-            </div>
-            <div class="card-body">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="progress flex-grow-1">
-                        <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="medals-box fs-4 text-end"></div>
-                </div>
-                <p class="card-text small mb-1"></p>
-                <small class="text-body-secondary">${event.desc}</small>
-            </div>
-        `;
+        // textContent, a nie innerHTML — dane z events.json nie są traktowane jak HTML.
+        card.querySelector(".event-name").textContent = event.name;
+        card.querySelector(".event-desc").textContent = event.desc;
         container.appendChild(card);
         return {
             badge: card.querySelector(".percent-chip"),
