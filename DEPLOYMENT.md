@@ -238,6 +238,7 @@ gh workflow run Deploy
 | `rsync: failed to set permissions` | `deploy` does not own `DEPLOY_PATH` — re-run the `chown` |
 | Deploy succeeds but the site 403s | SELinux label missing on a non-`/var/www` root — see "Using a different directory" above |
 | `DEPLOY_PATH ... is a system directory` | You pointed it at `/srv` or `/var` rather than the site's own subdirectory |
+| `mkdir "/srv/cazp/srv/cazp" failed` (path doubled) | The key uses `rrsync` but `DEPLOY_RRSYNC` is not set to `true` — see "Optional hardening" below |
 | Verify fails on "Generated files are stale" | You edited `data/events.json` without running `node tools/build-agent-files.mjs`; run it and commit |
 | Site serves old CSS after a deploy | Browser or CDN cache — see the `Cache-Control` block above |
 
@@ -252,3 +253,18 @@ restrict,command="rrsync -wo /var/www/cazp" ssh-ed25519 AAAA... github-actions-c
 
 Check where your distro puts it first (`command -v rrsync` or
 `/usr/share/rsync/scripts/rrsync`) and use the full path if it is not on `PATH`.
+
+**This also requires a repository variable**, because `rrsync` resolves incoming paths
+*relative to* the root in its own command line. Sending the absolute `DEPLOY_PATH` on top of
+that would write the site to `/var/www/cazp/var/www/cazp`, so tell the workflow that the
+server already pins the destination:
+
+```sh
+gh variable set DEPLOY_RRSYNC --body 'true'
+```
+
+With that set, the workflow sends to the rrsync root itself and does not use `DEPLOY_PATH` —
+the `authorized_keys` line becomes the single place the web root is defined, and the
+system-directory guard is left to the server. `DEPLOY_PATH` stays useful as documentation and
+for the nginx `root`, but changing it alone will no longer move the deployment. Leave
+`DEPLOY_RRSYNC` unset for a plain deploy key.

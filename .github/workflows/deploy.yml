@@ -77,7 +77,18 @@ jobs:
           DEPLOY_USER: ${{ vars.DEPLOY_USER }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
           DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+          DEPLOY_RRSYNC: ${{ vars.DEPLOY_RRSYNC }}
         run: |
+          if [ "$DEPLOY_RRSYNC" = "true" ]; then
+            # The authorized_keys line pins the destination with
+            # command="rrsync -wo <root>", and rrsync resolves incoming paths
+            # relative to that root — sending an absolute DEPLOY_PATH would
+            # land the site in <root>/<DEPLOY_PATH>. The server decides where
+            # the files go, which is what the guard below is for, so it is
+            # skipped rather than validating a value that is never sent.
+            echo "::notice::DEPLOY_RRSYNC is true — the server's rrsync root decides the destination; DEPLOY_PATH is not sent."
+            dest="/"
+          else
           # --delete removes files on the server that no longer exist in the
           # repo, so a wrong path here would wipe a directory. Refuse the
           # obviously dangerous values before doing anything.
@@ -102,6 +113,8 @@ jobs:
               exit 1
               ;;
           esac
+          dest="$target/"
+          fi
           if [ -z "$DEPLOY_USER" ]; then
             echo "::error::DEPLOY_USER variable is not set. See DEPLOYMENT.md."
             exit 1
@@ -115,7 +128,7 @@ jobs:
             --exclude='README.md' \
             --exclude='CLAUDE.md' \
             --exclude='DEPLOYMENT.md' \
-            ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+            ./ "$DEPLOY_USER@$DEPLOY_HOST:$dest"
 
       - name: Smoke test
         env:
