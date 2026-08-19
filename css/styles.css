@@ -274,27 +274,39 @@ h1.display-1 {
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* --- Przycisk zmiany języka (szklana pigułka) --- */
-.lang-btn {
+/* --- Pływające pigułki: język i repozytorium (szklany wygląd) --- */
+.lang-btn,
+.repo-btn {
     position: fixed;
     top: 18px;
-    right: 18px;
     z-index: 1050;
-    font-weight: 700;
-    letter-spacing: 1px;
     color: var(--ink);
     background: var(--glass);
     border: 1px solid var(--glass-border);
     border-radius: 999px;
-    padding: 6px 16px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     transition: background 0.2s ease, transform 0.2s ease;
 }
-.lang-btn:hover {
+.lang-btn:hover,
+.repo-btn:hover {
     background: var(--glass-strong);
     color: #fff;
     transform: translateY(-1px);
+}
+.lang-btn {
+    right: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 16px;
+}
+/* Ikona zamiast tekstu: inne odstępy, ta sama wysokość co pigułka języka. */
+.repo-btn {
+    left: 18px;
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 15px;
+    line-height: 1;
 }
 
 /* --- Dostępność: mniej ruchu --- */
@@ -311,6 +323,8 @@ h1.display-1 {
 
 /* --- Mobile --- */
 @media (max-width: 480px) {
+    /* Na wąskich ekranach tagline sięgał aż pod pływające pigułki w rogach. */
+    .hero-tagline { margin-top: 18px; }
     .time-tile { min-width: 78px; flex-basis: 88px; padding: 10px 6px 8px; }
     .time-tile .tile-val { font-size: 1.6rem; }
     .medal-bar { gap: 14px; padding: 10px 16px; }

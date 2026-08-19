@@ -38,6 +38,7 @@ const translations = {
         medalBronze: "Brąz",
         medalSilver: "Srebro",
         medalGold: "Złoto",
+        repoLabel: "Kod źródłowy na GitHubie",
         labelSurpassed: (ratio, time) => `Acerixx jest bezrobotny <span class="text-danger fw-bold">${ratio}x dłużej</span> niż trwało to wydarzenie. Wyprzedza je o ok. ${time}.`,
         labelPending: (time, percent) => `To wydarzenie trwało jeszcze <span class="text-success fw-bold">${time}</span> dłużej. Acerixx osiągnął ${percent}% jego długości.`,
         forms: {
@@ -70,6 +71,7 @@ const translations = {
         medalBronze: "Bronze",
         medalSilver: "Silver",
         medalGold: "Gold",
+        repoLabel: "Source code on GitHub",
         labelSurpassed: (ratio, time) => `Acerixx has been unemployed <span class="text-danger fw-bold">${ratio}x longer</span> than this event lasted. He surpassed it by approx. ${time}.`,
         labelPending: (time, percent) => `This event lasted <span class="text-success fw-bold">${time}</span> longer. Acerixx reached ${percent}% of its duration.`,
         forms: {
@@ -165,6 +167,7 @@ function updateCounter() {
     document.getElementById("main-header").textContent = t.mainTitle;
     document.getElementById("hero-tagline").textContent = t.pageTitle;
     document.getElementById("comparisons-eyebrow").textContent = currentLang === 'pl' ? "Porównania historyczne" : "Historical comparisons";
+    document.getElementById("repo-link").setAttribute("aria-label", t.repoLabel);
     document.title = t.pageTitle;
 
     const grid = document.getElementById("counter");
