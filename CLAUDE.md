@@ -71,6 +71,21 @@ Keep both halves in mind: anything added to the live UI that would render empty 
 should be hidden under `html.no-js`, and any new data shown to users should reach the static
 summary via the generator.
 
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which rsyncs the repo to the
+production server. Consequences worth remembering:
+
+- **The verify job fails the build if generated files are stale.** If you change
+  `data/events.json` or `startDate`, run `node tools/build-agent-files.mjs` and commit the
+  result in the same change, or the deploy will not go out.
+- **`rsync --delete` mirrors the repo**, so deleting a file here deletes it from the web root.
+- **The exclude list in the workflow decides what is public.** Anything added to the repo is
+  served unless excluded there — check it before committing something that should not be on the
+  web root.
+
+Full setup notes live in `DEPLOYMENT.md`.
+
 ## Conventions
 
 - **4-space indentation everywhere, no tabs, no trailing whitespace.** All seven source files

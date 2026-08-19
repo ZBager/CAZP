@@ -1,0 +1,118 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never let two deploys race each other onto the server.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generated files are up to date
+        run: |
+          node tools/build-agent-files.mjs
+          if ! git diff --quiet; then
+            echo "::error::Generated files are stale. Run 'node tools/build-agent-files.mjs' locally and commit the result."
+            git diff --stat
+            exit 1
+          fi
+
+      - name: JavaScript parses
+        run: |
+          node --check js/main.js
+          node --check dlc/js/main.js
+          node --check tools/build-agent-files.mjs
+
+      - name: events.json is valid JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('data/events.json', 'utf8'))"
+
+      - name: Warn if deployment is not configured
+        if: vars.DEPLOY_HOST == ''
+        run: |
+          echo "::notice::DEPLOY_HOST is not set, so the deploy job will be skipped. See DEPLOYMENT.md."
+
+  deploy:
+    name: Deploy to server
+    needs: verify
+    runs-on: ubuntu-latest
+    # Skip cleanly instead of failing when the server is not configured yet.
+    if: vars.DEPLOY_HOST != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ]; then
+            echo "::error::DEPLOY_SSH_KEY and DEPLOY_KNOWN_HOSTS secrets must both be set. See DEPLOYMENT.md."
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/deploy_key
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy with rsync
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+        run: |
+          # --delete removes files on the server that no longer exist in the
+          # repo, so a wrong path here would wipe a directory. Refuse the
+          # obviously dangerous values before doing anything.
+          case "$DEPLOY_PATH" in
+            ""|"/"|"/root"|"/home"|"/etc"|"/usr"|"/var")
+              echo "::error::DEPLOY_PATH ('$DEPLOY_PATH') is empty or unsafe. Point it at the site directory, e.g. /var/www/cazp."
+              exit 1
+              ;;
+          esac
+          if [ -z "$DEPLOY_USER" ]; then
+            echo "::error::DEPLOY_USER variable is not set. See DEPLOYMENT.md."
+            exit 1
+          fi
+
+          rsync --archive --compress --delete --human-readable --stats \
+            -e "ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT -o StrictHostKeyChecking=yes" \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='tools/' \
+            --exclude='README.md' \
+            --exclude='CLAUDE.md' \
+            --exclude='DEPLOYMENT.md' \
+            ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+
+      - name: Smoke test
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "SITE_URL not set — skipping smoke test."
+            exit 0
+          fi
+          echo "Checking $SITE_URL ..."
+          for path in "/" "/data/events.json" "/llms.txt"; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "${SITE_URL%/}$path")
+            echo "  $path -> $code"
+            [ "$code" = "200" ] || { echo "::error::$path returned $code"; exit 1; }
+          done

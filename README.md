@@ -28,6 +28,9 @@ The UI is bilingual (Polish by default, English via the toggle in the top-right 
 ├── sitemap.xml
 ├── tools/
 │   └── build-agent-files.mjs   # Regenerates llms.txt + the static summary
+├── DEPLOYMENT.md       # Server setup and the deploy workflow
+├── .github/workflows/
+│   └── deploy.yml      # Verify + rsync to the server on every push to main
 └── dlc/
     ├── index.html      # "Kliknij, żeby Acerixx się umył!" page
     ├── css/styles.css
@@ -154,8 +157,13 @@ changes nothing.
 
 ## Deploying
 
-Copy the repository contents to any static host — there is nothing to compile. The paths in
-`index.html` and `dlc/index.html` are relative, so the site also works from a subdirectory.
+Pushing to `main` deploys automatically: a GitHub Actions workflow verifies the repo and
+`rsync`s it to the server over SSH. Setup, secrets and troubleshooting are in
+[`DEPLOYMENT.md`](DEPLOYMENT.md).
+
+There is nothing to compile, so deploying by hand is just copying the files to any static host.
+The paths in `index.html` and `dlc/index.html` are relative, so the site also works from a
+subdirectory.
 
 ## A note on language
 
