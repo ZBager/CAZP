@@ -86,8 +86,10 @@ jobs:
             # land the site in <root>/<DEPLOY_PATH>. The server decides where
             # the files go, which is what the guard below is for, so it is
             # skipped rather than validating a value that is never sent.
+            # "." and not "/": rrsync refuses any absolute path as an unsafe
+            # arg, including the root it was itself given.
             echo "::notice::DEPLOY_RRSYNC is true — the server's rrsync root decides the destination; DEPLOY_PATH is not sent."
-            dest="/"
+            dest="."
           else
           # --delete removes files on the server that no longer exist in the
           # repo, so a wrong path here would wipe a directory. Refuse the
