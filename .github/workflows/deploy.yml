@@ -81,9 +81,24 @@ jobs:
           # --delete removes files on the server that no longer exist in the
           # repo, so a wrong path here would wipe a directory. Refuse the
           # obviously dangerous values before doing anything.
-          case "$DEPLOY_PATH" in
-            ""|"/"|"/root"|"/home"|"/etc"|"/usr"|"/var")
-              echo "::error::DEPLOY_PATH ('$DEPLOY_PATH') is empty or unsafe. Point it at the site directory, e.g. /var/www/cazp."
+          # Strip trailing slashes first, otherwise "/var/" would sail past a
+          # check for "/var".
+          target="$DEPLOY_PATH"
+          while [ "$target" != "/" ] && [ "${target%/}" != "$target" ]; do
+            target="${target%/}"
+          done
+          case "$target" in
+            /*) ;;
+            *)
+              echo "::error::DEPLOY_PATH ('$DEPLOY_PATH') must be an absolute path."
+              exit 1
+              ;;
+          esac
+          case "$target" in
+            ""|"/"|"/bin"|"/boot"|"/dev"|"/etc"|"/home"|"/lib"|"/media"|"/mnt"\
+            |"/opt"|"/proc"|"/root"|"/run"|"/sbin"|"/srv"|"/sys"|"/tmp"|"/usr"\
+            |"/var"|"/var/www"|"/srv/www")
+              echo "::error::DEPLOY_PATH ('$DEPLOY_PATH') is a system directory. Point it at the site's own directory, e.g. /srv/cazp or /var/www/cazp."
               exit 1
               ;;
           esac

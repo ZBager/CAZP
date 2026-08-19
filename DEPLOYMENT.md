@@ -45,6 +45,39 @@ sudo chmod -R 755 /var/www/cazp
 
 The `deploy` user only needs write access to that one directory — it does not need sudo.
 
+#### Using a different directory, e.g. `/srv/cazp`
+
+Nothing hardcodes `/var/www/cazp` — the location is the `DEPLOY_PATH` variable. To serve from
+`/srv/cazp` instead, change it in four places:
+
+```sh
+sudo mkdir -p /srv/cazp
+sudo chown -R deploy:www-data /srv/cazp
+sudo chmod -R 755 /srv/cazp
+
+gh variable set DEPLOY_PATH --body '/srv/cazp'    # step 3 below
+```
+
+plus `root /srv/cazp;` in the nginx block, and the path inside `rrsync -wo ...` if you use the
+optional hardening. The workflow refuses bare system directories, so `/srv` on its own is
+rejected while `/srv/cazp` is accepted.
+
+**If the server runs SELinux (RHEL, Fedora, Rocky, Alma), `/srv` needs one extra step.**
+`/var/www` ships pre-labelled as web content; `/srv` does not, so nginx gets a permission error
+reading files whose Unix permissions look perfectly correct. Check with `getenforce`, and if it
+says `Enforcing`:
+
+```sh
+sudo semanage fcontext -a -t httpd_sys_content_t "/srv/cazp(/.*)?"
+sudo restorecon -Rv /srv/cazp
+ls -Zd /srv/cazp        # should now show httpd_sys_content_t
+```
+
+(`semanage` lives in the `policycoreutils-python-utils` package.) Debian and Ubuntu use AppArmor
+instead, whose default nginx profile does not restrict document roots, so `/srv` works there
+without any of this. Either way `/srv` itself must stay traversable — `chmod 755 /srv` — or the
+web server cannot descend into it.
+
 ### 2. On your machine — create a deploy key
 
 A dedicated key, with **no passphrase** (GitHub Actions cannot type one):
@@ -203,6 +236,8 @@ gh workflow run Deploy
 | `Host key verification failed` | `DEPLOY_KNOWN_HOSTS` is stale or missing — re-run `ssh-keyscan` |
 | `Permission denied (publickey)` | Public key not in `/home/deploy/.ssh/authorized_keys`, or the file's permissions are not `600` |
 | `rsync: failed to set permissions` | `deploy` does not own `DEPLOY_PATH` — re-run the `chown` |
+| Deploy succeeds but the site 403s | SELinux label missing on a non-`/var/www` root — see "Using a different directory" above |
+| `DEPLOY_PATH ... is a system directory` | You pointed it at `/srv` or `/var` rather than the site's own subdirectory |
 | Verify fails on "Generated files are stale" | You edited `data/events.json` without running `node tools/build-agent-files.mjs`; run it and commit |
 | Site serves old CSS after a deploy | Browser or CDN cache — see the `Cache-Control` block above |
 
