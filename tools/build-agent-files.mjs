@@ -110,6 +110,12 @@ const jsonLd = {
         name: "Porównania historyczne",
         description: `Lista ${events.length} wydarzeń historycznych wraz z czasem ich trwania, porównywanych z czasem bezrobocia liczonym od ${startIso}. Czas bezrobocia jest dokładny, ale długości wydarzeń są zaokrąglone (rok = 365 dni, miesiąc = 30 dni), więc procenty są przybliżone.`,
         temporalCoverage: `${startIso}/..`,
+        creator: {
+            "@type": "Person",
+            name: "ZBager",
+            url: "https://github.com/ZBager"
+        },
+        license: "https://creativecommons.org/publicdomain/zero/1.0/",
         distribution: {
             "@type": "DataDownload",
             encodingFormat: "application/json",
