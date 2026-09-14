@@ -32,6 +32,11 @@ chromium --headless --no-sandbox --virtual-time-budget=6000 --dump-dom http://12
 Useful assertions on that DOM dump: 24 occurrences of `class="card fade-up"` (one per event),
 non-empty `tile-*-val` spans, `class="js"` on `<html>`, and a populated `#global-medals`.
 
+Assert that those spans are *populated*, never that they *advance*. The counter ticks on
+animation frames, and headless Chromium produces none after the first paint, so the values are
+frozen at load time no matter how large `--virtual-time-budget` is. See the frame-driven tick
+entry under "Things that will bite you".
+
 To check what a JS-less agent sees, `curl http://127.0.0.1:8000/` and read the raw HTML — it
 should contain the full static summary. Chromium's `--disable-javascript` flag is ignored in
 headless mode, and `--blink-settings=scriptEnabled=false` breaks `--screenshot`; to render the
@@ -98,6 +103,11 @@ Full setup notes live in `DEPLOYMENT.md`.
   as *string content*, not code. Leave them alone.
 - **UI copy and code comments are in Polish.** Match the surrounding language when editing; do
   not translate existing Polish comments to English.
+- **No comments unless the "why" is non-obvious.** A comment that restates what the code already
+  says is noise — delete it rather than maintain it. A comment earns its place only when it
+  records something the code cannot: a browser quirk being worked around, a tradeoff that was
+  measured and accepted, a constraint another file depends on. When in doubt, leave the comment
+  out and make the code read clearly instead.
 - **Every user-facing string needs both `pl` and `en`**, either in the `translations` object in
   `js/main.js` or as a `{ "pl": ..., "en": ... }` pair in `data/events.json`.
 
@@ -106,10 +116,20 @@ Full setup notes live in `DEPLOYMENT.md`.
 - **`toggleLanguage()` must stay a global function declaration.** `index.html` calls it from an
   inline `onclick`. Do not convert `js/main.js` to a module, add `defer`, or wrap it in an IIFE
   without also rewiring that handler.
-- **`updateCounter()` runs once per second.** It mutates the text of existing nodes on purpose.
-  Do not rebuild `#comparisons` markup inside it — regenerating `innerHTML` every tick used to
-  restart the card entry animations. `buildComparisons()` is called only on first load and on
-  language change (guarded by `builtLang`).
+- **`updateCounter()` runs at most once per second.** It mutates the text of existing nodes on
+  purpose. Do not rebuild `#comparisons` markup inside it — regenerating `innerHTML` every tick
+  used to restart the card entry animations. `buildComparisons()` is called only on first load
+  and on language change (guarded by `builtLang`).
+- **The tick is frame-driven, not `setInterval`.** `renderCounterFrame()` reschedules itself with
+  `requestAnimationFrame` and calls `updateCounter()` only when the unix second changes;
+  `visibilitychange` stops the loop in a background tab and restarts it on return, resetting
+  `renderedSecond` so the first frame back repaints immediately. That is the point of the design:
+  the `setInterval` it replaced was throttled to roughly one call a minute in a background tab, so
+  returning to the page showed a stale time for up to a minute. The accepted cost is that the
+  counter paints once and then freezes wherever frames are not produced — headless Chromium,
+  prerender and screenshot services, a fully occluded window. This was measured and kept
+  deliberately. If you ever move the tick back onto a timer, keep the `visibilitychange` resync or
+  the original bug returns.
 - **Event data belongs in `data/events.json` only.** `getEvents(lang)` just flattens that data
   to one language. Never hardcode an event back into `js/main.js`.
 - **`duration` in the JSON is a unit breakdown, not seconds.** `durationToSeconds()` multiplies
