@@ -306,9 +306,46 @@ function toggleLanguage() {
 }
 
 // --- Start ---
-// Licznik rusza natychmiast; porównania dołączają, gdy JSON zostanie wczytany.
-updateCounter();
-setInterval(updateCounter, 1000);
+let counterFrame = null;
+let renderedSecond = null;
+
+function stopCounterAnimation() {
+    if (counterFrame !== null) {
+        cancelAnimationFrame(counterFrame);
+        counterFrame = null;
+    }
+}
+
+function renderCounterFrame() {
+    counterFrame = null;
+    if (document.hidden) return;
+
+    const currentSecond = Math.floor(Date.now() / 1000);
+    if (currentSecond !== renderedSecond) {
+        renderedSecond = currentSecond;
+        updateCounter();
+    }
+
+    counterFrame = requestAnimationFrame(renderCounterFrame);
+}
+
+function startCounterAnimation() {
+    stopCounterAnimation();
+    renderedSecond = null;
+    renderCounterFrame();
+}
+
+function handleVisibilityChange() {
+    if (document.hidden) {
+        stopCounterAnimation();
+    } else {
+        startCounterAnimation();
+    }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange);
+window.addEventListener("pageshow", startCounterAnimation);
+startCounterAnimation();
 
 loadEvents()
     .then(updateCounter)
