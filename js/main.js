@@ -1,18 +1,14 @@
 // --- Strefa czasowa strony ---
-// Licznik jest zakotwiczony w stałym przesunięciu UTC+02:00, a nie w czasie
-// lokalnym przeglądarki. Dzięki temu (a) wszyscy widzą te same wartości i
-// (b) zmiana czasu letni/zimowy nie przesuwa licznika o godzinę — w czasie
-// lokalnym doba po zmianie ma 23 lub 25 godzin, więc reszta z dzielenia
-// potrafiła pokazać "5d 23h" zamiast "6d 0h".
+// Stałe UTC+02:00, nie czas lokalny: wszyscy widzą tę samą wartość, a doba po
+// zmianie czasu nie ma 23/25 godzin i nie robi z "6d 0h" — "5d 23h".
 const SITE_UTC_OFFSET_HOURS = 2;
 const SITE_OFFSET_MS = SITE_UTC_OFFSET_HOURS * 3600000;
 
-// Moment odpowiadający podanej dacie "zegarowej" strony.
+// Argumenty to czas strony, nie UTC.
 function siteTime(year, month, day, hours = 0, minutes = 0, seconds = 0) {
     return new Date(Date.UTC(year, month, day, hours, minutes, seconds) - SITE_OFFSET_MS);
 }
 
-// Rozbicie moment -> pola kalendarzowe w strefie strony.
 function sitePartsOf(date) {
     const shifted = new Date(date.getTime() + SITE_OFFSET_MS);
     return {
@@ -26,7 +22,7 @@ function sitePartsOf(date) {
 }
 
 const startDate = siteTime(2023, 6, 26, 17, 0, 0);
-let currentLang = 'pl'; // Domyślny język
+let currentLang = 'pl';
 
 // --- Konfiguracja języków ---
 const translations = {
@@ -49,7 +45,7 @@ const translations = {
             minutes: (n) => n === 1 ? "minuty" : "minut",
             seconds: (n) => n === 1 ? "sekundy" : "sekund"
         },
-        // Funkcje dla opisów różnic (Biernik)
+        // Biernik — do opisów różnic.
         daysAcc: (n) => n === 1 ? "dzień" : "dni",
         hoursAcc: (n) => {
             if (n === 1) return "godzinę";
@@ -82,7 +78,7 @@ const translations = {
             minutes: (n) => n === 1 ? "minute" : "minutes",
             seconds: (n) => n === 1 ? "second" : "seconds"
         },
-        // Angielski ma prostszą gramatykę dla biernika w tym kontekście
+        // Angielski nie odmienia — formy jak wyżej.
         daysAcc: (n) => n === 1 ? "day" : "days",
         hoursAcc: (n) => n === 1 ? "hour" : "hours",
         minutesAcc: (n) => n === 1 ? "minute" : "minutes",
@@ -91,8 +87,8 @@ const translations = {
 };
 
 // --- Dane wydarzeń (wczytywane z data/events.json) ---
-// Plik JSON trzyma czas trwania jako rozbicie na jednostki (np. { years: 3,
-// months: 2 }), a "unitSeconds" definiuje ile sekund ma każda jednostka.
+// "duration" w JSON-ie to rozbicie na jednostki, nie sekundy — przelicza je
+// "unitSeconds" z tego samego pliku.
 let eventsData = null;
 
 function durationToSeconds(duration, unitSeconds) {
@@ -110,7 +106,6 @@ async function loadEvents() {
     }));
 }
 
-// Spłaszczenie danych do jednego języka (kształt oczekiwany przez resztę kodu)
 function getEvents(lang) {
     return eventsData.map((event) => ({
         name: event.name[lang],
@@ -132,7 +127,7 @@ function formatDuration(totalSeconds, lang) {
     return result.join(" ") || t.moment;
 }
 
-// --- Budowa struktury porównań (tworzona raz, przebudowywana tylko po zmianie języka) ---
+// --- Budowa struktury porównań ---
 // Markup karty mieszka w <template id="comparison-card"> w index.html.
 let comparisonEls = null;
 let builtLang = null;
@@ -144,7 +139,7 @@ function buildComparisons(events) {
     comparisonEls = events.map((event, i) => {
         const card = template.content.firstElementChild.cloneNode(true);
         card.style.animationDelay = `${Math.min(i * 60, 600)}ms`;
-        // textContent, a nie innerHTML — dane z events.json nie są traktowane jak HTML.
+        // textContent, nie innerHTML — events.json nie jest traktowany jak HTML.
         card.querySelector(".event-name").textContent = event.name;
         card.querySelector(".event-desc").textContent = event.desc;
         container.appendChild(card);
@@ -163,7 +158,6 @@ function updateCounter() {
     const t = translations[currentLang];
     const now = new Date();
 
-    // Aktualizacja nagłówka i tytułu
     document.getElementById("main-header").textContent = t.mainTitle;
     document.getElementById("hero-tagline").textContent = t.pageTitle;
     document.getElementById("comparisons-eyebrow").textContent = currentLang === 'pl' ? "Porównania historyczne" : "Historical comparisons";
@@ -181,9 +175,8 @@ function updateCounter() {
     grid.hidden = false;
     msg.hidden = true;
 
-    // 1. Obliczanie czasu dla głównego licznika
-    // Kolejne rocznice i "miesięcznice" liczone w kalendarzu strefy strony —
-    // lata przestępne i różne długości miesięcy są więc uwzględnione.
+    // Rocznice liczone w kalendarzu strefy strony — lata przestępne i różne
+    // długości miesięcy wychodzą z tego same.
     const from = sitePartsOf(startDate);
     let years = 0, months = 0;
     let anniversary = startDate;
@@ -220,7 +213,7 @@ function updateCounter() {
     setTile("seconds", seconds, t.forms.seconds(seconds));
 
 
-    // Daily streaks
+    // Serie są zmyślone: baseline + dni od streakBaseDate, nie z żadnego API.
     const streakBaseDate = siteTime(2026, 6, 12);
     const streakDays = Math.floor((new Date()-streakBaseDate)/86400000);
     document.getElementById('genshin-streak').textContent=(816+Math.max(0,streakDays))+' '+(currentLang==='pl'?'dni':'days');
@@ -230,7 +223,7 @@ function updateCounter() {
     document.getElementById('checked-wuwa').textContent=currentLang==='pl'?'Sprawdzono dzisiaj.':'Checked today.';
 
 
-    // 2. Obliczanie porównań (dopiero gdy dane wydarzeń są już wczytane)
+    // Wszystko poniżej czeka na JSON — pierwsze tyknięcia wychodzą tutaj.
     if (!eventsData) return;
 
     const totalDiffSeconds = Math.floor((now - startDate) / 1000);
@@ -238,8 +231,7 @@ function updateCounter() {
 
     const events = getEvents(currentLang);
 
-    // Zbuduj karty tylko raz (lub po zmianie języka). Odtwarzanie całego
-    // innerHTML co sekundę wymuszało ponowne odgrywanie animacji kart.
+    // Raz na język: odtwarzanie innerHTML co sekundę restartowało animacje kart.
     if (builtLang !== currentLang || !comparisonEls || comparisonEls.length !== events.length) {
         buildComparisons(events);
     }
@@ -264,13 +256,11 @@ function updateCounter() {
             }
         }
 
-        // Logika medali
         let medals = "";
         if (percent >= 100) { medals += "🥉"; totalBronze++; }
         if (percent >= 200) { medals += "🥈"; totalSilver++; totalBronze--; }
         if (percent >= 500) { medals += "🥇"; totalGold++; totalSilver--; }
 
-        // Tekst opisu
         let descText = "";
         if (totalDiffSeconds > event.duration) {
             const diff = totalDiffSeconds - event.duration;
@@ -282,7 +272,6 @@ function updateCounter() {
             descText = t.labelPending(formatDuration(diff, currentLang), progress);
         }
 
-        // Aktualizuj tylko zmienne wartości w istniejących elementach
         els.badge.textContent = `${percent.toFixed(1)}%`;
         els.bar.className = `progress-bar ${barClass}`;
         els.bar.style.width = `${barWidth}%`;
@@ -306,6 +295,9 @@ function toggleLanguage() {
 }
 
 // --- Start ---
+// Tyknięcia z requestAnimationFrame, nie setInterval: w karcie w tle timery są
+// dławione do ~1/min, więc po powrocie licznik przez chwilę pokazywał
+// nieaktualny czas. Cena: bez klatek (headless, prerender) rysuje się raz i stoi.
 let counterFrame = null;
 let renderedSecond = null;
 

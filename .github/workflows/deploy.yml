@@ -81,22 +81,16 @@ jobs:
           DEPLOY_RRSYNC: ${{ vars.DEPLOY_RRSYNC }}
         run: |
           if [ "$DEPLOY_RRSYNC" = "true" ]; then
-            # The authorized_keys line pins the destination with
-            # command="rrsync -wo <root>", and rrsync resolves incoming paths
-            # relative to that root — sending an absolute DEPLOY_PATH would
-            # land the site in <root>/<DEPLOY_PATH>. The server decides where
-            # the files go, which is what the guard below is for, so it is
-            # skipped rather than validating a value that is never sent.
-            # "." and not "/": rrsync refuses any absolute path as an unsafe
-            # arg, including the root it was itself given.
+            # authorized_keys pins the destination via command="rrsync -wo <root>"
+            # and rrsync resolves paths relative to it, so an absolute DEPLOY_PATH
+            # would land the site in <root>/<DEPLOY_PATH>. It is never sent, hence
+            # no guard below. "." not "/": rrsync rejects absolute paths outright.
             echo "::notice::DEPLOY_RRSYNC is true — the server's rrsync root decides the destination; DEPLOY_PATH is not sent."
             dest="."
           else
-          # --delete removes files on the server that no longer exist in the
-          # repo, so a wrong path here would wipe a directory. Refuse the
-          # obviously dangerous values before doing anything.
-          # Strip trailing slashes first, otherwise "/var/" would sail past a
-          # check for "/var".
+          # --delete wipes whatever is not in the repo, so a wrong path here
+          # takes a directory with it. Trailing slashes go first — otherwise
+          # "/var/" sails past a check for "/var".
           target="$DEPLOY_PATH"
           while [ "$target" != "/" ] && [ "${target%/}" != "$target" ]; do
             target="${target%/}"
@@ -162,8 +156,8 @@ jobs:
             check "$path returns 200" "200" "$code"
           done
 
-          # The page itself must still be HTML for anything that asks for HTML,
-          # static summary included — that is what crawlers and AI agents read.
+          # Anything asking for HTML must still get it, static summary included —
+          # that is what crawlers and AI agents read.
           page=$(curl -sS --max-time 20 -H 'Accept: text/html' "$base/")
           case "$page" in
             *"<title>"*) html_title=yes ;; *) html_title=no ;;
@@ -179,10 +173,9 @@ jobs:
           esac
           check "/data/events.json is still the data" "yes" "$json"
 
-          # The Cloudflare Worker is deployed by hand, outside this workflow, so
-          # these check the live edge rather than anything rsync just copied.
-          # Set the CURL_ANSWER variable to 'true' once the Worker is routed —
-          # see DEPLOYMENT.md, "The terminal answer".
+          # The Worker is deployed by hand, so this checks the live edge, not
+          # anything rsync just copied. Set CURL_ANSWER to 'true' once it is
+          # routed — see DEPLOYMENT.md, "The terminal answer".
           if [ "$CURL_ANSWER" = "true" ]; then
             echo "Checking the terminal answer ..."
             check "curl $base/ prints the answer" "Nie." "$(curl -sS --max-time 20 "$base/")"
@@ -193,8 +186,8 @@ jobs:
               "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 -H 'Accept: text/html' "$insecure/")"
             check "the redirect target is https" "$base/" \
               "$(curl -sS -o /dev/null -w '%{redirect_url}' --max-time 20 -H 'Accept: text/html' "$insecure/")"
-            # Ask as a browser would: the Worker's plain-text reply carries no
-            # HSTS by design, and no browser ever receives that reply.
+            # Ask as a browser would — the Worker's plain-text reply carries no
+            # HSTS by design, and no browser ever receives it.
             check "HSTS survives on https" "yes" \
               "$(curl -sS -o /dev/null -D - --max-time 20 -H 'Accept: text/html' "$base/" | grep -qi '^strict-transport-security:' && echo yes || echo no)"
           else

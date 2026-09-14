@@ -1,17 +1,12 @@
 #!/usr/bin/env node
-// Regeneruje statyczne treści dla botów i agentów AI (ChatGPT, Gemini, Claude...),
-// które pobierają surowy HTML i nie wykonują JavaScriptu.
+// Regeneruje statyczne treści dla botów i agentów AI, które czytają surowy HTML
+// i nie wykonują JavaScriptu. Do odpalenia ręcznie po każdej zmianie wydarzeń
+// lub daty startowej:
 //
-// Źródłem prawdy są:
-//   js/main.js        -> startDate (data początkowa licznika)
-//   data/events.json  -> lista wydarzeń
-//
-// Generowane są:
-//   index.html        -> blok <section id="static-summary"> + JSON-LD
-//   llms.txt          -> podsumowanie strony w Markdown dla modeli językowych
-//
-// Uruchomienie (po każdej zmianie wydarzeń lub daty startowej):
 //   node tools/build-agent-files.mjs
+//
+// js/main.js + data/events.json -> blok static-summary i JSON-LD w index.html,
+// llms.txt.
 
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -25,7 +20,7 @@ const write = (name, content) => {
     console.log(`  wrote ${name}`);
 };
 
-// --- Data startowa i strefa: wyciągnięte z js/main.js, żeby nie mieć dwóch źródeł prawdy ---
+// --- Data startowa i strefa (z js/main.js, żeby nie mieć dwóch źródeł prawdy) ---
 function readStartDate() {
     const source = read("js/main.js");
     const match = source.match(
@@ -46,8 +41,7 @@ const MONTHS_PL = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca",
 const humanStartDate = (d) =>
     `${d.day} ${MONTHS_PL[d.month - 1]} ${d.year}, godz. ${pad(d.hour)}:${pad(d.minute)}`;
 
-// Licznik jest zakotwiczony w stałym przesunięciu (bez zmiany czasu), więc data
-// startowa ma jednoznaczne ISO — takie samo dla każdego odwiedzającego.
+// Stałe przesunięcie, bez zmiany czasu — ISO wychodzi jedno dla wszystkich.
 function isoStartDate(d) {
     const sign = d.offsetHours < 0 ? "-" : "+";
     const offset = `${sign}${pad(Math.abs(d.offsetHours))}:00`;
@@ -89,7 +83,7 @@ const events = data.events.map((event) => ({
 const escapeHtml = (text) =>
     text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-// --- 1. data/events.json: dopisz datę startową, żeby plik był samowystarczalny ---
+// --- 1. data/events.json: data startowa, żeby plik był samowystarczalny ---
 write("data/events.json", JSON.stringify({
     startDate: startIso,
     unitSeconds: data.unitSeconds,
