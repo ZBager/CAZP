@@ -35,6 +35,17 @@ const translations = {
         medalSilver: "Srebro",
         medalGold: "Złoto",
         repoLabel: "Kod źródłowy na GitHubie",
+        sortLabel: "Sortuj",
+        sortAria: "Sortuj porównania",
+        sortOptions: {
+            default: "Domyślnie",
+            lengthDesc: "Najdłuższe",
+            lengthAsc: "Najkrótsze",
+            nameAsc: "A → Z",
+            nameDesc: "Z → A",
+            medalAsc: "Blisko medalu",
+            medalDesc: "Daleko od medalu"
+        },
         labelSurpassed: (ratio, time) => `Acerixx jest bezrobotny <span class="text-danger fw-bold">${ratio}x dłużej</span> niż trwało to wydarzenie. Wyprzedza je o ok. ${time}.`,
         labelPending: (time, percent) => `To wydarzenie trwało jeszcze <span class="text-success fw-bold">${time}</span> dłużej. Acerixx osiągnął ${percent}% jego długości.`,
         forms: {
@@ -68,6 +79,17 @@ const translations = {
         medalSilver: "Silver",
         medalGold: "Gold",
         repoLabel: "Source code on GitHub",
+        sortLabel: "Sort",
+        sortAria: "Sort comparisons",
+        sortOptions: {
+            default: "Default",
+            lengthDesc: "Longest first",
+            lengthAsc: "Shortest first",
+            nameAsc: "A → Z",
+            nameDesc: "Z → A",
+            medalAsc: "Medal soonest",
+            medalDesc: "Medal latest"
+        },
         labelSurpassed: (ratio, time) => `Acerixx has been unemployed <span class="text-danger fw-bold">${ratio}x longer</span> than this event lasted. He surpassed it by approx. ${time}.`,
         labelPending: (time, percent) => `This event lasted <span class="text-success fw-bold">${time}</span> longer. Acerixx reached ${percent}% of its duration.`,
         forms: {
@@ -127,10 +149,89 @@ function formatDuration(totalSeconds, lang) {
     return result.join(" ") || t.moment;
 }
 
+// --- Sortowanie porównań ---
+// Progi medali jako wielokrotności długości wydarzenia: 🥉 100%, 🥈 200%, 🥇 500%.
+const MEDAL_THRESHOLDS = [1, 2, 5];
+
+// Infinity dla wydarzenia po złocie — odejmowanie dałoby NaN, więc porównanie
+// przez < zamiast różnicy.
+function secondsToNextMedal(event, elapsed) {
+    const next = MEDAL_THRESHOLDS.map((multiple) => multiple * event.duration).find((threshold) => threshold > elapsed);
+    return next === undefined ? Infinity : next - elapsed;
+}
+
+function byNextMedal(a, b) {
+    if (a.toNextMedal === b.toNextMedal) return 0;
+    return a.toNextMedal < b.toNextMedal ? -1 : 1;
+}
+
+const sortComparators = {
+    default: null,
+    lengthDesc: (a, b) => b.duration - a.duration,
+    lengthAsc: (a, b) => a.duration - b.duration,
+    nameAsc: (a, b) => a.name.localeCompare(b.name, currentLang),
+    nameDesc: (a, b) => b.name.localeCompare(a.name, currentLang),
+    medalAsc: byNextMedal,
+    medalDesc: (a, b) => byNextMedal(b, a)
+};
+
+let sortMode = "default";
+let sortMenuLang = null;
+
+function sortEvents(events, elapsed) {
+    const comparator = sortComparators[sortMode];
+    if (!comparator) return events;
+    return events
+        .map((event) => ({ ...event, toNextMedal: secondsToNextMedal(event, elapsed) }))
+        .sort(comparator);
+}
+
+function buildSortMenu() {
+    const menu = document.getElementById("sort-menu");
+    menu.innerHTML = "";
+    Object.keys(sortComparators).forEach((mode) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "dropdown-item";
+        item.dataset.sort = mode;
+        item.textContent = translations[currentLang].sortOptions[mode];
+        item.addEventListener("click", () => setSortMode(mode));
+        const li = document.createElement("li");
+        li.appendChild(item);
+        menu.appendChild(li);
+    });
+    sortMenuLang = currentLang;
+}
+
+function updateSortUi() {
+    const t = translations[currentLang];
+    const toggle = document.getElementById("sort-toggle");
+    document.getElementById("sort-label").textContent = sortMode === "default" ? t.sortLabel : t.sortOptions[sortMode];
+    toggle.setAttribute("aria-label", `${t.sortAria}: ${t.sortOptions[sortMode]}`);
+    document.querySelectorAll("#sort-menu .dropdown-item").forEach((item) => {
+        const active = item.dataset.sort === sortMode;
+        item.classList.toggle("active", active);
+        if (active) {
+            item.setAttribute("aria-current", "true");
+        } else {
+            item.removeAttribute("aria-current");
+        }
+    });
+}
+
+function setSortMode(mode) {
+    if (mode === sortMode) return;
+    sortMode = mode;
+    updateSortUi();
+    updateCounter();
+}
+
 // --- Budowa struktury porównań ---
 // Markup karty mieszka w <template id="comparison-card"> w index.html.
 let comparisonEls = null;
 let builtLang = null;
+let builtSort = null;
+let orderedEvents = null;
 
 function buildComparisons(events) {
     const container = document.getElementById("comparisons");
@@ -151,6 +252,7 @@ function buildComparisons(events) {
         };
     });
     builtLang = currentLang;
+    builtSort = sortMode;
 }
 
 // --- Główna logika ---
@@ -162,6 +264,10 @@ function updateCounter() {
     document.getElementById("hero-tagline").textContent = t.pageTitle;
     document.getElementById("comparisons-eyebrow").textContent = currentLang === 'pl' ? "Porównania historyczne" : "Historical comparisons";
     document.getElementById("repo-link").setAttribute("aria-label", t.repoLabel);
+    if (sortMenuLang !== currentLang) {
+        buildSortMenu();
+        updateSortUi();
+    }
     document.title = t.pageTitle;
 
     const grid = document.getElementById("counter");
@@ -231,12 +337,15 @@ function updateCounter() {
 
     const events = getEvents(currentLang);
 
-    // Raz na język: odtwarzanie innerHTML co sekundę restartowało animacje kart.
-    if (builtLang !== currentLang || !comparisonEls || comparisonEls.length !== events.length) {
-        buildComparisons(events);
+    // Raz na język i sortowanie: odtwarzanie innerHTML co sekundę restartowało
+    // animacje kart. Kolejność "do medalu" zależy od czasu, więc ustalana jest
+    // tu razem z kartami — inaczej tasowałaby je w trakcie czytania.
+    if (builtLang !== currentLang || builtSort !== sortMode || !comparisonEls || comparisonEls.length !== events.length) {
+        orderedEvents = sortEvents(events, totalDiffSeconds);
+        buildComparisons(orderedEvents);
     }
 
-    events.forEach((event, i) => {
+    orderedEvents.forEach((event, i) => {
         const els = comparisonEls[i];
         const percent = (totalDiffSeconds / event.duration) * 100;
         let barWidth = 0, barClass = "";

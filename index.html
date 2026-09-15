@@ -303,7 +303,16 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
-                <div class="section-eyebrow text-start mb-3" id="comparisons-eyebrow">Porównania historyczne</div>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div class="section-eyebrow text-start" id="comparisons-eyebrow">Porównania historyczne</div>
+                    <div class="dropdown" id="sort-control">
+                        <button class="btn btn-sm sort-btn dropdown-toggle" type="button" id="sort-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg class="sort-icon" viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="1.7" rx="0.85"/><rect x="2" y="7.15" width="8" height="1.7" rx="0.85"/><rect x="2" y="11.3" width="4" height="1.7" rx="0.85"/></svg>
+                            <span id="sort-label">Sortuj</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end sort-menu" id="sort-menu" aria-labelledby="sort-toggle"></ul>
+                    </div>
+                </div>
                 <div id="comparisons" class="vstack gap-4 text-start"></div>
             </div>
         </div>

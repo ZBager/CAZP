@@ -154,6 +154,47 @@ h1.display-1 {
     font-weight: 600;
 }
 
+/* --- Sortowanie porównań --- */
+.sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--ink-muted);
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+/* Odstęp robi gap, nie margines karetki Bootstrapa. */
+.sort-btn::after { margin-left: 0; }
+.sort-icon { flex: none; }
+.sort-btn:hover,
+.sort-btn:focus-visible,
+.sort-btn.show {
+    color: var(--ink);
+    background: var(--glass-strong);
+    border-color: var(--glass-border);
+}
+.sort-menu {
+    --bs-dropdown-bg: rgba(13, 13, 22, 0.94);
+    --bs-dropdown-border-color: var(--glass-border);
+    --bs-dropdown-border-radius: 14px;
+    --bs-dropdown-font-size: 0.85rem;
+    --bs-dropdown-link-color: var(--ink-muted);
+    --bs-dropdown-link-hover-color: var(--ink);
+    --bs-dropdown-link-hover-bg: var(--glass-strong);
+    --bs-dropdown-link-active-color: var(--violet);
+    --bs-dropdown-link-active-bg: var(--glass-strong);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-soft);
+}
+
 /* --- Karty (szkło) --- */
 .card {
     background: var(--glass);
@@ -340,6 +381,7 @@ html.no-js #counter-msg,
 html.no-js #game-streaks,
 html.no-js #global-medals,
 html.no-js #comparisons,
+html.no-js #sort-control,
 html.no-js .lang-btn { display: none; }
 
 #static-summary {
